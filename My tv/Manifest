@@ -1,0 +1,14 @@
+title=Persian Pro IPTV
+subtitle=Ultimate Streaming Experience
+major_version=1
+minor_version=0
+build_version=00001
+ui_resolutions=fhd
+
+# تنظیمات Splash Screen ایستا
+splash_screen_fhd=pkg:/images/splash_fhd.png
+splash_color=#121212
+splash_min_time=2000
+
+# آیکون منوی تلویزیون
+mm_icon_focus_hd=pkg:/images/icon_focus_hd.png
