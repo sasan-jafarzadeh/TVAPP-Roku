@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="ChannelItem" extends="Group">
+  <script type="text/brightscript" uri="pkg:/components/ChannelItem.brs" />
+  <interface>
+    <field id="itemContent" type="node"  onChange="onContentChange" />
+    <field id="itemSize"    type="array" value="[796, 72]" />
+  </interface>
+  <children>
+    <Rectangle id="rowBg"     width="796" height="72" color="0x0C2040FF" opacity="0" />
+    <Rectangle id="accentBar" translation="[0,4]" width="4" height="64"
+        color="0x3A8FFFFF" opacity="0" />
+    <Rectangle id="logoBox"   translation="[12,8]" width="54" height="54"
+        color="0x0C1428FF" />
+    <Poster id="logoImg" translation="[12,8]" width="54" height="54"
+        loadDisplayMode="scaleToFit" />
+    <Label id="logoFallback" translation="[12,8]" width="54" height="54"
+        horizAlign="center" vertAlign="center"
+        font="font:SmallBoldSystemFont" color="0x285080FF" text="TV" />
+    <Label id="titleLabel" translation="[78,16]" width="688" height="40"
+        vertAlign="center" color="0x8090AAFF" text="">
+      <Font uri="pkg:/fonts/NotoSans-Regular.ttf" size="25" />
+    </Label>
+    <Label id="favStar" translation="[764,10]" width="26" height="24"
+        horizAlign="center" font="font:SmallBoldSystemFont"
+        color="0xFFCC00FF" text="*" opacity="0" />
+  </children>
+</component>
