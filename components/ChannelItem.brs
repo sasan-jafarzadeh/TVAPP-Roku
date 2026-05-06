@@ -13,8 +13,10 @@ sub onContentChange()
     content = m.top.itemContent
     if content = invalid then return
 
-    if content.title <> invalid
+    if content.title <> invalid and content.title <> ""
         m.titleLabel.text = content.title
+    else
+        m.titleLabel.text = "Unknown"
     end if
 
     logo = ""
@@ -42,7 +44,8 @@ sub onContentChange()
 end sub
 
 sub onLogoLoadStatus()
-    if m.logoImg.loadStatus = "failed"
+    status = m.logoImg.loadStatus
+    if status = "failed"
         m.logoImg.uri          = ""
         m.logoImg.visible      = false
         m.logoFallback.visible = true

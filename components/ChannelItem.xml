@@ -22,6 +22,6 @@
     </Label>
     <Label id="favStar" translation="[764,10]" width="26" height="24"
         horizAlign="center" font="font:SmallBoldSystemFont"
-        color="0xFFCC00FF" text="*" opacity="0" />
+        color="0xFFCC00FF" text="★" opacity="0" />
   </children>
 </component>

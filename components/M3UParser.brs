@@ -2,31 +2,32 @@ sub init()
     m.top.functionName = "runTask"
 end sub
 
-
 function myTrim(str as String) as String
+    if str = invalid or str = "" then return ""
     start = 1
     endPos = Len(str)
-    while start <= endPos and (Mid(str, start, 1) = " " or Mid(str, start, 1) = chr(13) or Mid(str, start, 1) = chr(10))
+    while start <= endPos and (Mid(str, start, 1) = " " or Mid(str, start, 1) = chr(13) or Mid(str, start, 1) = chr(10) or Mid(str, start, 1) = chr(9))
         start = start + 1
     end while
-    while endPos >= start and (Mid(str, endPos, 1) = " " or Mid(str, endPos, 1) = chr(13) or Mid(str, endPos, 1) = chr(10))
+    while endPos >= start and (Mid(str, endPos, 1) = " " or Mid(str, endPos, 1) = chr(13) or Mid(str, endPos, 1) = chr(10) or Mid(str, endPos, 1) = chr(9))
         endPos = endPos - 1
     end while
+    if start > endPos then return ""
     return Mid(str, start, endPos - start + 1)
 end function
 
-
 function getSubCategory(s as String) as String
+    if s = invalid or s = "" then return "General"
     lo = LCase(s)
     if Instr(1, lo, "news") > 0 or Instr(1, lo, "haber") > 0 then return "News"
     if Instr(1, lo, "sport") > 0 or Instr(1, lo, "spor") > 0 or Instr(1, lo, "fight") > 0 then return "Sports"
     if Instr(1, lo, "music") > 0 or Instr(1, lo, "muzik") > 0 then return "Music"
-    if Instr(1, lo, "movie") > 0 or Instr(1, lo, "film") > 0 or Instr(1, lo, "series") > 0 or Instr(1, lo, "entertainment") > 0 or Instr(1, lo, "classic") > 0 or Instr(1, lo, "comedy") > 0 or Instr(1, lo, "cinema") > 0 or Instr(1, lo, "drama") > 0 then return "Entertainment"
+    if Instr(1, lo, "movie") > 0 or Instr(1, lo, "film") > 0 or Instr(1, lo, "series") > 0 or Instr(1, lo, "entertainment") > 0 or Instr(1, lo, "classic") > 0 or Instr(1, lo, "comedy") > 0 or Instr(1, lo, "drama") > 0 then return "Entertainment"
     return "General"
 end function
 
-
 function getSubCategoryFromTitle(t as String) as String
+    if t = invalid or t = "" then return "General"
     lo = LCase(t)
     if Instr(1, lo, "news") > 0 or Instr(1, lo, "khabar") > 0 or Instr(1, lo, "press") > 0 or Instr(1, lo, "international") > 0 then return "News"
     if Instr(1, lo, "sport") > 0 or Instr(1, lo, "varzesh") > 0 or Instr(1, lo, "fight") > 0 or Instr(1, lo, "fit") > 0 then return "Sports"
@@ -35,8 +36,11 @@ function getSubCategoryFromTitle(t as String) as String
     return "General"
 end function
 
-
 function detectLanguage(title as String, groupRaw as String, url as String) as String
+    if title = invalid then title = ""
+    if groupRaw = invalid then groupRaw = ""
+    if url = invalid then url = ""
+    
     tlo = LCase(title)
     glo = LCase(groupRaw)
     ulo = LCase(url)
@@ -48,14 +52,11 @@ function detectLanguage(title as String, groupRaw as String, url as String) as S
 
     if Instr(1, ulo, "iptv-org.github.io/iptv/countries/ir") > 0 then return "Persian"
 
-    if Instr(1, ulo, "telewebion.ir") > 0 then return "Persian"
-    if Instr(1, ulo, "telewebion.com") > 0 then return "Persian"
-    if Instr(1, ulo, "presstv.ir") > 0 then return "Persian"
-    if Instr(1, ulo, "presstv.com") > 0 then return "Persian"
+    if Instr(1, ulo, "telewebion.ir") > 0 or Instr(1, ulo, "telewebion.com") > 0 then return "Persian"
+    if Instr(1, ulo, "presstv.ir") > 0 or Instr(1, ulo, "presstv.com") > 0 then return "Persian"
     if Instr(1, ulo, "persiana.live") > 0 then return "Persian"
     if Instr(1, ulo, "alalam.ir") > 0 then return "Persian"
-    if Instr(1, ulo, "irib.ir") > 0 then return "Persian"
-    if Instr(1, ulo, ".irib.") > 0 then return "Persian"
+    if Instr(1, ulo, "irib.ir") > 0 or Instr(1, ulo, ".irib.") > 0 then return "Persian"
 
     if isPersian(title) then return "Persian"
 
@@ -63,7 +64,6 @@ function detectLanguage(title as String, groupRaw as String, url as String) as S
 
     return ""
 end function
-
 
 function getFullGroup(title as String, groupRaw as String, url as String) as String
     lang = detectLanguage(title, groupRaw, url)
@@ -83,8 +83,8 @@ function getFullGroup(title as String, groupRaw as String, url as String) as Str
     return "General"
 end function
 
-
 function isPersian(title as String) as Boolean
+    if title = invalid or title = "" then return false
     lo = LCase(title)
 
     if Instr(1, lo, "iran") > 0 then return true
@@ -106,53 +106,43 @@ function isPersian(title as String) as Boolean
     if Instr(1, lo, "jaam jam") > 0 then return true
     if Instr(1, lo, "jaamjam") > 0 then return true
     if Instr(1, lo, "jam-e jam") > 0 then return true
-    if Instr(1, lo, "al-alam") > 0 then return true
-    if Instr(1, lo, "alalam") > 0 then return true
-    if Instr(1, lo, "al alam") > 0 then return true
+    if Instr(1, lo, "al-alam") > 0 or Instr(1, lo, "alalam") > 0 or Instr(1, lo, "al alam") > 0 then return true
     if Instr(1, lo, "hispan") > 0 then return true
     if Instr(1, lo, "sahar") > 0 then return true
     if Instr(1, lo, "omid") > 0 then return true
     if Instr(1, lo, "oxir") > 0 then return true
     if Instr(1, lo, "persiana") > 0 then return true
     if Instr(1, lo, "manoto") > 0 then return true
-    if Instr(1, lo, "gem tv") > 0 then return true
-    if Instr(1, lo, "gemtv") > 0 then return true
+    if Instr(1, lo, "gem tv") > 0 or Instr(1, lo, "gemtv") > 0 then return true
     if Instr(1, lo, "varzesh") > 0 then return true
     if Instr(1, lo, "shaparak") > 0 then return true
     if Instr(1, lo, "ifilm") > 0 then return true
-    if Instr(1, lo, "press tv") > 0 then return true
-    if Instr(1, lo, "presstv") > 0 then return true
+    if Instr(1, lo, "press tv") > 0 or Instr(1, lo, "presstv") > 0 then return true
     if Instr(1, lo, "ofogh") > 0 then return true
     if Instr(1, lo, "nasim") > 0 then return true
     if Instr(1, lo, "amouzesh") > 0 then return true
     if Instr(1, lo, "quran") > 0 then return true
-    if Instr(1, lo, "hamadan") > 0 then return true
-    if Instr(1, lo, "isfahan") > 0 then return true
-    if Instr(1, lo, "esfahan") > 0 then return true
-    if Instr(1, lo, "sepahan") > 0 then return true
+    if Instr(1, lo, "hamadan") > 0 or Instr(1, lo, "hamedan") > 0 then return true
+    if Instr(1, lo, "isfahan") > 0 or Instr(1, lo, "esfahan") > 0 or Instr(1, lo, "sepahan") > 0 then return true
     if Instr(1, lo, "khorasan") > 0 then return true
     if Instr(1, lo, "tabriz") > 0 then return true
     if Instr(1, lo, "sahand") > 0 then return true
-    if Instr(1, lo, "azarbayjan") > 0 then return true
-    if Instr(1, lo, "azerbaijan") > 0 then return true
+    if Instr(1, lo, "azarbayjan") > 0 or Instr(1, lo, "azerbaijan") > 0 then return true
     if Instr(1, lo, "kermanshah") > 0 then return true
     if Instr(1, lo, "shiraz") > 0 then return true
     if Instr(1, lo, "fars") > 0 then return true
     if Instr(1, lo, "ahvaz") > 0 then return true
-    if Instr(1, lo, "khuzestan") > 0 then return true
-    if Instr(1, lo, "khouzestan") > 0 then return true
+    if Instr(1, lo, "khuzestan") > 0 or Instr(1, lo, "khouzestan") > 0 then return true
     if Instr(1, lo, "mashhad") > 0 then return true
     if Instr(1, lo, "tehran") > 0 then return true
     if Instr(1, lo, "sari") > 0 then return true
     if Instr(1, lo, "rasht") > 0 then return true
-    if Instr(1, lo, "golestan") > 0 then return true
-    if Instr(1, lo, "gorgan") > 0 then return true
+    if Instr(1, lo, "golestan") > 0 or Instr(1, lo, "gorgan") > 0 then return true
     if Instr(1, lo, "semnan") > 0 then return true
     if Instr(1, lo, "yazd") > 0 then return true
     if Instr(1, lo, "zanjan") > 0 then return true
     if Instr(1, lo, "ardabil") > 0 then return true
-    if Instr(1, lo, "bushehr") > 0 then return true
-    if Instr(1, lo, "boushehr") > 0 then return true
+    if Instr(1, lo, "bushehr") > 0 or Instr(1, lo, "boushehr") > 0 then return true
     if Instr(1, lo, "hormozgan") > 0 then return true
     if Instr(1, lo, "ilam") > 0 then return true
     if Instr(1, lo, "lorestan") > 0 then return true
@@ -163,16 +153,12 @@ function isPersian(title as String) as Boolean
     if Instr(1, lo, "sistan") > 0 then return true
     if Instr(1, lo, "baluchestan") > 0 then return true
     if Instr(1, lo, "gilan") > 0 then return true
-    if Instr(1, lo, "kurdistan") > 0 then return true
-    if Instr(1, lo, "kordestan") > 0 then return true
+    if Instr(1, lo, "kurdistan") > 0 or Instr(1, lo, "kordestan") > 0 then return true
     if lo = "kerman" or Instr(1, lo, "kerman ") > 0 or Instr(1, lo, " kerman") > 0 then return true
-    if Instr(1, lo, "mahabad") > 0 then return true
-    if Instr(1, lo, "mhababad") > 0 then return true
+    if Instr(1, lo, "mahabad") > 0 or Instr(1, lo, "mhababad") > 0 then return true
     if Instr(1, lo, "sanandaj") > 0 then return true
-    if Instr(1, lo, "urmia") > 0 then return true
-    if Instr(1, lo, "orumiyeh") > 0 then return true
-    if Instr(1, lo, "bandarabbas") > 0 then return true
-    if Instr(1, lo, "bandar abbas") > 0 then return true
+    if Instr(1, lo, "urmia") > 0 or Instr(1, lo, "orumiyeh") > 0 then return true
+    if Instr(1, lo, "bandarabbas") > 0 or Instr(1, lo, "bandar abbas") > 0 then return true
     if Instr(1, lo, "zahedan") > 0 then return true
     if Instr(1, lo, "bojnord") > 0 then return true
     if Instr(1, lo, "shahroud") > 0 then return true
@@ -180,23 +166,21 @@ function isPersian(title as String) as Boolean
     if Instr(1, lo, "arak") > 0 then return true
     if Instr(1, lo, "dezful") > 0 then return true
     if Instr(1, lo, "abadan") > 0 then return true
-    if Instr(1, lo, "chaharmahal") > 0 then return true
-    if Instr(1, lo, "bakhtiari") > 0 then return true
-    if Instr(1, lo, "kohgiluyeh") > 0 then return true
-    if Instr(1, lo, "boyer") > 0 then return true
-    if Instr(1, lo, "alborz") > 0 then return true
-    if Instr(1, lo, "karaj") > 0 then return true
-    if Instr(1, lo, "hamedan") > 0 then return true
+    if Instr(1, lo, "chaharmahal") > 0 or Instr(1, lo, "bakhtiari") > 0 then return true
+    if Instr(1, lo, "kohgiluyeh") > 0 or Instr(1, lo, "boyer") > 0 then return true
+    if Instr(1, lo, "alborz") > 0 or Instr(1, lo, "karaj") > 0 then return true
     return false
 end function
 
-' FIX 1: fetchUrl is now a dedicated function that returns the body string or ""
-' This avoids re-creating roUrlTransfer logic inline and makes timeout handling explicit.
 function fetchUrl(url as String) as String
+    if url = invalid or url = "" then return ""
+    
     transfer = CreateObject("roUrlTransfer")
     transfer.SetCertificatesFile("common:/certs/ca-bundle.crt")
     transfer.InitClientCertificates()
     transfer.EnableFreshConnection(true)
+    transfer.SetConnectTimeout(10)
+    transfer.SetReadTimeout(10)
     transfer.AddHeader("User-Agent", "Roku/DVP-12.0")
     transfer.SetUrl(url)
 
@@ -204,13 +188,13 @@ function fetchUrl(url as String) as String
     transfer.SetMessagePort(port)
 
     if not transfer.AsyncGetToString()
-        print "AsyncGetToString failed for "; url
+        print "[M3UParser] AsyncGetToString failed for: " + url
         return ""
     end if
 
     msg = wait(15000, port)
     if msg = invalid
-        print "Timeout for "; url
+        print "[M3UParser] Timeout for: " + url
         transfer.AsyncCancel()
         return ""
     end if
@@ -219,12 +203,24 @@ function fetchUrl(url as String) as String
         code = msg.GetResponseCode()
         if code = 200
             body = msg.GetString()
-            if body <> invalid then return body
+            if body <> invalid and body <> "" then return body
         else
-            print "HTTP "; code; " for "; url
+            print "[M3UParser] HTTP " + intToStr(code) + " for: " + url
         end if
     end if
     return ""
+end function
+
+function intToStr(n as Integer) as String
+    s = Stri(n)
+    r = ""
+    i = 1
+    while i <= Len(s)
+        c = Mid(s, i, 1)
+        if c <> " " then r = r + c
+        i = i + 1
+    end while
+    return r
 end function
 
 sub runTask()
@@ -235,28 +231,29 @@ sub runTask()
         "https://onureroz.com/indirmeler/turk/index.m3u"
     ]
 
-    reg  = CreateObject("roRegistrySection", "IPTVSources")
+    reg = CreateObject("roRegistrySection", "IPTVSources")
     keys = reg.GetKeyList()
-    for each k in keys
-        savedUrl = reg.Read(k)
-        if savedUrl <> invalid and savedUrl <> ""
-            m3uUrls.Push(savedUrl)
-        end if
-    end for
+    if keys <> invalid
+        for each k in keys
+            savedUrl = reg.Read(k)
+            if savedUrl <> invalid and savedUrl <> ""
+                m3uUrls.Push(savedUrl)
+            end if
+        end for
+    end if
 
-    ' FIX 2: Accumulate lines directly instead of one giant concatenated string.
-    ' Avoids O(N^2) string growth and the double-newline boundary trick.
     allLines = []
 
     for each m_url in m3uUrls
         body = fetchUrl(m_url)
         if body <> "" and body <> invalid
-            ' FIX 3: Strip Windows CR so every line trim is consistent.
             body = body.Replace(chr(13), "")
             chunks = body.Split(chr(10))
-            for each ln in chunks
-                allLines.Push(ln)
-            end for
+            if chunks <> invalid
+                for each ln in chunks
+                    if ln <> invalid then allLines.Push(ln)
+                end for
+            end if
         end if
     end for
 
@@ -266,15 +263,16 @@ sub runTask()
         return
     end if
 
-    groupOrder   = []
+    groupOrder = []
     groupBuckets = {}
 
     currentTitle = ""
     currentGroup = "Other"
-    currentLogo  = ""
+    currentLogo = ""
 
     for each line in allLines
         line = myTrim(line)
+        if line = "" then continue for
 
         if Left(line, 7) = "#EXTINF"
 
@@ -283,10 +281,10 @@ sub runTask()
                 currentTitle = myTrim(Mid(line, titlePos + 1))
             end if
 
-            groupStart = Instr(1, line, "group-title=""")
+            groupStart = Instr(1, line, "group-title=\"")
             if groupStart > 0
                 groupStart = groupStart + 13
-                groupEnd = Instr(groupStart, line, """")
+                groupEnd = Instr(groupStart, line, "\"")
                 if groupEnd > groupStart
                     currentGroup = myTrim(Mid(line, groupStart, groupEnd - groupStart))
                 else
@@ -296,10 +294,10 @@ sub runTask()
                 currentGroup = "Other"
             end if
 
-            logoStart = Instr(1, line, "tvg-logo=""")
+            logoStart = Instr(1, line, "tvg-logo=\"")
             if logoStart > 0
                 logoStart = logoStart + 10
-                logoEnd = Instr(logoStart, line, """")
+                logoEnd = Instr(logoStart, line, "\"")
                 if logoEnd > logoStart
                     currentLogo = Mid(line, logoStart, logoEnd - logoStart)
                 else
@@ -309,15 +307,14 @@ sub runTask()
                 currentLogo = ""
             end if
 
-        ' FIX 4: Accept https:// as well as http:// for stream URLs.
-        else if Left(line, 4) = "http"
+        else if Left(line, 7) = "http://" or Left(line, 8) = "https://"
 
             if currentTitle = "" then currentTitle = line
 
             channel = {
                 title: currentTitle
-                url:   line
-                logo:  currentLogo
+                url: line
+                logo: currentLogo
                 group: currentGroup
             }
 
@@ -331,12 +328,11 @@ sub runTask()
             groupBuckets[finalGroup].Push(channel)
 
             currentTitle = ""
-            currentLogo  = ""
+            currentLogo = ""
 
         end if
     end for
 
-    ' Build ordered group list (Persian → Turkish → General → rest)
     orderedGroups = []
     subCats = ["News", "Sports", "Music", "Entertainment", "General"]
     for each sc in subCats
@@ -360,20 +356,21 @@ sub runTask()
     root = CreateObject("RoSGNode", "ContentNode")
 
     for each groupName in orderedGroups
-        gNode = root.createChild("ContentNode")
-        gNode.title = groupName
+        if groupBuckets.DoesExist(groupName)
+            gNode = root.createChild("ContentNode")
+            gNode.title = groupName
 
-        for each ch in groupBuckets[groupName]
-            item = gNode.createChild("ContentNode")
-            item.title = ch.title
-            item.url   = ch.url
-            if ch.logo <> ""
-                item.hdPosterUrl = ch.logo
-            end if
-        end for
+            for each ch in groupBuckets[groupName]
+                item = gNode.createChild("ContentNode")
+                item.title = ch.title
+                item.url = ch.url
+                if ch.logo <> ""
+                    item.hdPosterUrl = ch.logo
+                end if
+            end for
+        end if
     end for
 
     m.top.content = root
     m.top.state = "DONE"
-
 end sub
