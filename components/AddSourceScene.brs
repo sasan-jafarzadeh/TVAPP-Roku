@@ -1,37 +1,22 @@
-' ─────────────────────────────────────────────────────────────────────────────
-' AddSourceScene – M3U/URL + Xtream Codes input overlay
-'
-' Key map (final, no conflicts):
-'   REW / FF    → switch tab (M3U ↔ Xtream)
-'   Play        → in M3U tab: Save   |   in Xtream tab: next field (Host→User→Pass→Host)
-'   DOWN (kbd)  → move to saved list or Save button
-'   OK (kbd)    → Save (same as Play in M3U tab)
-'   Back        → close overlay
-'   Pause       → jump straight to button row
-' ─────────────────────────────────────────────────────────────────────────────
-
 sub init()
-    m.tabIdx    = 0          ' 0=M3U  1=Xtream
-    m.xtField   = 0          ' 0=host 1=user 2=pass  (Xtream only)
-    m.focusArea = "keyboard" ' "keyboard" | "list" | "save" | "delete" | "cancel"
+    m.tabIdx    = 0
+    m.xtField   = 0
+    m.focusArea = "keyboard"
     m.lastSavedUrl = ""
     m.didSave      = false
 
-    ' Tab UI
     m.tabM3U      = m.top.findNode("tabM3U")
     m.tabXtream   = m.top.findNode("tabXtream")
     m.tabUnder    = m.top.findNode("tabUnderline")
     m.panelM3U    = m.top.findNode("panelM3U")
     m.panelXtream = m.top.findNode("panelXtream")
 
-    ' Input display labels
     m.urlDisplay    = m.top.findNode("urlDisplay")
     m.xtHostDisplay = m.top.findNode("xtHostDisplay")
     m.xtUserDisplay = m.top.findNode("xtUserDisplay")
     m.xtPassDisplay = m.top.findNode("xtPassDisplay")
     m.fieldLabel    = m.top.findNode("fieldLabel")
 
-    ' Controls
     m.keyboard  = m.top.findNode("inputKeyboard")
     m.savedList = m.top.findNode("savedList")
     m.msgLabel  = m.top.findNode("msgLabel")
@@ -39,7 +24,6 @@ sub init()
     m.btnDelete = m.top.findNode("btnDelete")
     m.btnCancel = m.top.findNode("btnCancel")
 
-    ' Per-field text buffers
     m.urlText  = ""
     m.hostText = ""
     m.userText = ""
@@ -53,10 +37,6 @@ sub init()
     m.keyboard.setFocus(true)
     highlightFocus()
 end sub
-
-' ─────────────────────────────────────────────────────────────────────────────
-' Keyboard text → buffer
-' ─────────────────────────────────────────────────────────────────────────────
 
 sub onKeyboardText()
     txt = m.keyboard.text
@@ -76,10 +56,6 @@ sub onKeyboardText()
         end if
     end if
 end sub
-
-' ─────────────────────────────────────────────────────────────────────────────
-' Tab switching
-' ─────────────────────────────────────────────────────────────────────────────
 
 sub switchTab(idx as Integer)
     m.tabIdx  = idx
@@ -107,10 +83,6 @@ sub switchTab(idx as Integer)
     highlightFocus()
 end sub
 
-' ─────────────────────────────────────────────────────────────────────────────
-' Xtream field switching
-' ─────────────────────────────────────────────────────────────────────────────
-
 sub setXtField(f as Integer)
     m.xtField = f
     if f = 0
@@ -134,10 +106,6 @@ sub setXtField(f as Integer)
     end if
 end sub
 
-' ─────────────────────────────────────────────────────────────────────────────
-' Build Xtream URL
-' ─────────────────────────────────────────────────────────────────────────────
-
 function buildXtreamUrl() as String
     host = myTrimAS(m.hostText)
     user = myTrimAS(m.userText)
@@ -147,25 +115,21 @@ function buildXtreamUrl() as String
     return host + "/get.php?username=" + user + "&password=" + pass + "&type=m3u_plus&output=ts"
 end function
 
-' ─────────────────────────────────────────────────────────────────────────────
-' Saved sources list
-' ─────────────────────────────────────────────────────────────────────────────
-
 sub loadSavedSources()
     keys = m.reg.GetKeyList()
-    gc   = CreateObject("RoSGNode", "ContentNode")
-    for each k in keys
-        raw  = m.reg.Read(k)
-        item = gc.createChild("ContentNode")
-        item.title = raw
-        item._key  = k   ' stash the registry key so doDelete can target it exactly
-    end for
+    gc = CreateObject("RoSGNode", "ContentNode")
+    if keys <> invalid
+        for each k in keys
+            raw  = m.reg.Read(k)
+            if raw <> invalid and raw <> ""
+                item = gc.createChild("ContentNode")
+                item.title = raw
+                item._key  = k
+            end if
+        end for
+    end if
     m.savedList.content = gc
 end sub
-
-' ─────────────────────────────────────────────────────────────────────────────
-' Save / Delete
-' ─────────────────────────────────────────────────────────────────────────────
 
 sub doSave()
     m.msgLabel.text = ""
@@ -199,7 +163,6 @@ sub doSave()
     m.msgLabel.text = "Saved!  Press Back to close or choose below"
     loadSavedSources()
 
-    ' Clear all field buffers and keyboard
     m.urlText  = ""
     m.hostText = ""
     m.userText = ""
@@ -210,7 +173,6 @@ sub doSave()
     m.xtPassDisplay.text = ""
     m.keyboard.text = ""
 
-    ' Move focus to savedList so user can see what was just added
     if m.savedList.content <> invalid and m.savedList.content.getChildCount() > 0
         m.focusArea = "list"
         m.savedList.setFocus(true)
@@ -224,21 +186,20 @@ sub doDelete()
     item = m.savedList.content.getChild(idx)
     if item = invalid then return
 
-    ' item.title holds the raw URL; item._key holds the registry key we stored at save time.
-    ' Use the key directly to avoid accidentally deleting a duplicate URL entry.
     raw  = item.title
     regKey = item._key
     if regKey <> invalid and regKey <> ""
         m.reg.Delete(regKey)
     else
-        ' Fallback: scan by value (legacy entries without _key)
         keys = m.reg.GetKeyList()
-        for each k in keys
-            if m.reg.Read(k) = raw
-                m.reg.Delete(k)
-                exit for
-            end if
-        end for
+        if keys <> invalid
+            for each k in keys
+                if m.reg.Read(k) = raw
+                    m.reg.Delete(k)
+                    exit for
+                end if
+            end for
+        end if
     end if
     m.reg.Flush()
 
@@ -246,26 +207,15 @@ sub doDelete()
     loadSavedSources()
 end sub
 
-' ─────────────────────────────────────────────────────────────────────────────
-' Close
-' ─────────────────────────────────────────────────────────────────────────────
-
 sub closeWithResult()
     if m.didSave
-        ' Reset flag first so a second Back press doesn't re-fire
         m.didSave = false
-        ' Include a nonce (timestamp) so the assocarray value always changes
-        ' and the observer in MainScene fires even on consecutive saves.
         dt = CreateObject("roDateTime")
         m.top.result = { type: "saved", url: m.lastSavedUrl, _ts: dt.AsSeconds() }
     else
         m.top.closed = true
     end if
 end sub
-
-' ─────────────────────────────────────────────────────────────────────────────
-' Focus highlight
-' ─────────────────────────────────────────────────────────────────────────────
 
 sub highlightFocus()
     m.btnSave.color   = "0x4A9FFFFF"
@@ -280,39 +230,29 @@ sub highlightFocus()
     end if
 end sub
 
-' ─────────────────────────────────────────────────────────────────────────────
-' Trim helper
-' ─────────────────────────────────────────────────────────────────────────────
-
 function myTrimAS(str as String) as String
+    if str = invalid then return ""
     start  = 1
     endPos = Len(str)
-    while start <= endPos and (Mid(str, start, 1) = " " or Mid(str, start, 1) = chr(13) or Mid(str, start, 1) = chr(10))
+    while start <= endPos and (Mid(str, start, 1) = " " or Mid(str, start, 1) = chr(13) or Mid(str, start, 1) = chr(10) or Mid(str, start, 1) = chr(9))
         start = start + 1
     end while
-    while endPos >= start and (Mid(str, endPos, 1) = " " or Mid(str, endPos, 1) = chr(13) or Mid(str, endPos, 1) = chr(10))
+    while endPos >= start and (Mid(str, endPos, 1) = " " or Mid(str, endPos, 1) = chr(13) or Mid(str, endPos, 1) = chr(10) or Mid(str, endPos, 1) = chr(9))
         endPos = endPos - 1
     end while
+    if start > endPos then return ""
     return Mid(str, start, endPos - start + 1)
 end function
-
-' ─────────────────────────────────────────────────────────────────────────────
-' Key handler
-' ─────────────────────────────────────────────────────────────────────────────
 
 function onKeyEvent(key as String, press as Boolean) as Boolean
     if not press then return false
 
-    ' Back always closes
     if key = "back"
         closeWithResult()
         return true
     end if
 
-    ' ── Keyboard area ─────────────────────────────────────────────────────
     if m.focusArea = "keyboard"
-
-        ' Tab switching via REW / FF (no conflict with keyboard L/R)
         if key = "rewind" or key = "rev"
             if m.tabIdx = 1 then switchTab(0)
             return true
@@ -322,9 +262,6 @@ function onKeyEvent(key as String, press as Boolean) as Boolean
             return true
         end if
 
-        ' Play key behaviour depends on tab:
-        '   M3U tab   → Save  (primary action, no other use for Play here)
-        '   Xtream tab → cycle to next field (Host→User→Pass→Host)
         if key = "play"
             if m.tabIdx = 0
                 doSave()
@@ -337,13 +274,11 @@ function onKeyEvent(key as String, press as Boolean) as Boolean
             return true
         end if
 
-        ' OK on keyboard = Save (both tabs: if Xtream all fields must be filled)
         if key = "ok"
             doSave()
             return true
         end if
 
-        ' DOWN: move out of keyboard zone
         if key = "down"
             if m.savedList.content <> invalid and m.savedList.content.getChildCount() > 0
                 m.focusArea = "list"
@@ -355,18 +290,15 @@ function onKeyEvent(key as String, press as Boolean) as Boolean
             return true
         end if
 
-        ' Pause: jump straight to button row
         if key = "pause"
             m.focusArea = "save"
             highlightFocus()
             return true
         end if
 
-        ' All other keys fall through to Keyboard node
         return false
     end if
 
-    ' ── Saved-list area ────────────────────────────────────────────────────
     if m.focusArea = "list"
         if key = "up" and m.savedList.itemFocused = 0
             m.focusArea = "keyboard"
@@ -400,7 +332,6 @@ function onKeyEvent(key as String, press as Boolean) as Boolean
         return false
     end if
 
-    ' ── Button row ─────────────────────────────────────────────────────────
     if m.focusArea = "save" or m.focusArea = "delete" or m.focusArea = "cancel"
         if key = "left"
             if m.focusArea = "delete"       then m.focusArea = "save"

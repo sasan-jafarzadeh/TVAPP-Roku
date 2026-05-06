@@ -10,48 +10,38 @@
 
   <children>
 
-    <!-- dim overlay -->
     <Rectangle id="dimBg" translation="[0,0]"
         width="1920" height="1080" color="0x000000CC" />
 
-    <!-- dialog box -->
     <Rectangle id="dialogBox" translation="[160,60]"
         width="1600" height="960" color="0x0D1428FF" />
 
-    <!-- left accent line -->
     <Rectangle translation="[160,60]"
         width="6" height="960" color="0x4A9FFFFF" />
 
-    <!-- title -->
     <Label id="dlgTitle" translation="[200,80]" width="1500"
         font="font:LargeBoldSystemFont"
         color="0x4A9FFFFF" text="Add Source" />
 
-    <!-- TAB bar separator -->
     <Rectangle translation="[160,140]" width="1600" height="2" color="0x1A3A6AFF" />
 
-    <!-- Tab: M3U -->
     <Label id="tabM3U" translation="[200,150]" width="220"
         font="font:MediumBoldSystemFont" color="0xFFFFFFFF"
         text="M3U / URL" />
 
-    <!-- Tab: Xtream (full label, wider width) -->
     <Label id="tabXtream" translation="[460,150]" width="280"
         font="font:MediumBoldSystemFont" color="0x556688FF"
         text="Xtream Codes" />
 
-    <!-- Navigation hint (right side of tab bar) -->
     <Label id="tabHint" translation="[780,155]" width="900"
         font="font:SmallSystemFont" color="0x445566FF"
         text="REW/FF: switch tab    Play: save    DOWN: saved list" />
 
-    <!-- Active-tab underline -->
     <Rectangle id="tabUnderline"
         translation="[200,178]" width="220" height="3"
         color="0x4A9FFFFF" />
     <Rectangle translation="[160,184]" width="1600" height="2" color="0x1A3A6AFF" />
 
-    <!-- ===== M3U panel ===== -->
     <Group id="panelM3U" translation="[0,0]" visible="true">
 
       <Label translation="[200,200]"
@@ -70,7 +60,6 @@
 
     </Group>
 
-    <!-- ===== Xtream Codes panel ===== -->
     <Group id="panelXtream" translation="[0,0]" visible="false">
 
       <Label translation="[200,200]"
@@ -100,14 +89,11 @@
 
     </Group>
 
-    <!-- Active field indicator (sits above keyboard, no overlap with keyboard) -->
     <Label id="fieldLabel" translation="[200,376]" width="300"
         font="font:SmallBoldSystemFont" color="0x4A9FFFFF" text="" />
 
-    <!-- ===== Keyboard ===== -->
     <Keyboard id="inputKeyboard" translation="[300,400]" visible="true" />
 
-    <!-- ===== Saved sources list ===== -->
     <Rectangle translation="[160,758]" width="1600" height="2" color="0x1A3A6AFF" />
 
     <Label translation="[200,766]"
@@ -119,7 +105,6 @@
         drawFocusFeedback="true" focusBitmapUri=""
         visible="true" />
 
-    <!-- ===== Buttons row ===== -->
     <Rectangle translation="[160,916]" width="1600" height="2" color="0x1A3A6AFF" />
 
     <Label id="btnSave"   translation="[200,926]" width="180"
@@ -131,7 +116,6 @@
     <Label id="btnCancel" translation="[1480,926]" width="180"
         font="font:MediumBoldSystemFont" color="0x888888FF"  text="[ Cancel ]" />
 
-    <!-- Status message (center of button row) -->
     <Label id="msgLabel" translation="[660,926]" width="780"
         font="font:SmallSystemFont" color="0xFF9933FF" text="" />
 
